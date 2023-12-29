@@ -9,7 +9,7 @@ def get_classifier(
         datax: np.ndarray,
         datay: np.ndarray) -> SGDClassifier:
 
-    classifier = SGDClassifier(loss="log", penalty=None)
+    classifier = SGDClassifier(loss="log_loss", penalty=None)
     classifier.fit(datax, datay)
     return classifier
 
@@ -40,7 +40,7 @@ def margin_counts(
     preds = classifier.predict_proba(data)[:, 1]
     
     # Find data points for which prediction is at least gamma away from 0.5
-    margin_indicess = np.where((preds > (0.5 + gamma)) | (preds < (0.5 - gamma)))[0]
+    margin_indices = np.where((preds > (0.5 + gamma)) | (preds < (0.5 - gamma)))[0]
 
     return float(len(margin_indices))
 

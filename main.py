@@ -23,9 +23,13 @@ if __name__ == "__main__":
             dataset_config["test_count"],
             dataset_config["bag_of_words_max_features"])
         
+        print("Dataset loaded...")
+
         classifier = lrutils.get_classifier(
             dataset.get_train_data(),
             dataset.get_train_labels())
+
+        print("Classifier fit...")
 
         lrutils.test_classifier(
             classifier,
@@ -33,7 +37,7 @@ if __name__ == "__main__":
             dataset.get_train_labels(),
             dataset.get_test_data(),
             dataset.get_test_labels())
-        
+
         diagrams = []
 
         gammas = np.arange(0.0, 0.5, 0.01)
@@ -48,28 +52,36 @@ if __name__ == "__main__":
             "Margin",
             "Fraction of Points Above Margin"))
         
+        print("Margin counts calculated...")
+
         # Get margin errors
         vect_margin_errors = np.vectorize(
             lambda g: lrutils.margin_errors(classifier, dataset.get_test_data(), dataset.get_test_labels(), g))
         
+        margin_errors = vect_margin_errors(gammas)
+
         diagrams.append(
             (gammas,
-            vect_margin_errors(gammas),
+            margin_errors,
             "Margin",
             "Error Rate"))
 
+        print("Margin errors calculated...")
+
         # Get safe margins
-        errors = np.arange(0.3, 0.133, -0.01)
+        errors = np.arange(np.max(margin_errors), np.min(margin_errors), -0.01)
         vect_find_safe_margin = np.vectorize(
-            lambda e: find_safe_margin(e, vect_margin_errors, gammas))
+            lambda e: lrutils.find_safe_margin(e, vect_margin_errors, gammas))
         
         safe_margins = vect_find_safe_margin(errors)
 
         diagrams.append(
             (errors,
-            sage_margins,
+            safe_margins,
             "Max Tolerable Error",
             "Safe Margin"))
+        
+        print("Safe margins calculated...")
         
         # Display all gathered data
         plot_diagrams(diagrams)

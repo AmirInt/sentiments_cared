@@ -19,23 +19,23 @@ class Dataset:
             test_count: int,
             max_features: int) -> None:
 
-        load_dataset(data_path)
+        self.load_dataset(data_path)
         
         if remove_punctuations:
-            remove_puncs()
+            self.remove_puncs()
         
         if remove_digits:
-            remove_numbers()
-
+            self.remove_numbers()
+        
         if lower_case:
-            to_lower_case()
+            self.to_lower_case()
         
         if remove_stop_words:
-            remove_stops(stop_words)
+            self.remove_stops(stop_words)
 
-        to_bag_of_words(max_features)
+        self.to_bag_of_words(max_features)
 
-        split_train_test(test_count)
+        self.split_train_test(test_count)
 
 
     def load_dataset(self, data_path: os.PathLike) -> None:
@@ -54,12 +54,19 @@ class Dataset:
         self.__y = 2 * self.__y - 1
 
 
+    def remove(self, x: str, removal_list: list) -> str:
+        for w in removal_list:
+            x = x.replace(w, ' ')
+        return x
+
+
     def remove_puncs(self) -> None:
-        self.__sentences = [s.replace(punc, ' ') for punc in list(string.punctuations) for s in self.__sentences]
+        self.__sentences = [self.remove(s, list(string.punctuation)) for s in self.__sentences]
 
     
     def remove_numbers(self) -> None:
-        self.__sentences = [s.replace(digit, ' ') for digit in str(range(10)) for s in self.__sentences]
+        numbers = [str(d) for d in range(10)]
+        self.__sentences = [self.remove(s, numbers) for s in self.__sentences]
     
 
     def to_lower_case(self) -> None:
@@ -69,7 +76,7 @@ class Dataset:
     def remove_stops(self, stop_words: list) -> None:
         self.__sentences = [s.split() for s in self.__sentences]
         self.__sentences = [" ".join(list(filter(lambda a: a not in stop_words, s))) for s in self.__sentences]
-    
+
     
     def to_bag_of_words(self, max_features) -> None:
         self.__vectoriser = CountVectorizer(
@@ -79,7 +86,7 @@ class Dataset:
             stop_words=None,
             max_features=max_features)
         
-        data_features = vectoriser.fit_transform(self.__sentences)
+        data_features = self.__vectoriser.fit_transform(self.__sentences)
 
         self.__sentences = data_features.toarray()
     
@@ -88,8 +95,8 @@ class Dataset:
         np.random.seed(0)
 
         test_indices = np.append(
-            np.random.choice(np.where(self.__y == -1)[0], test_count / 2, replace=False),
-            np.random.choice(np.where(self.__y == 1)[0], test_count / 2, replace=False))
+            np.random.choice(np.where(self.__y == -1)[0], int(test_count / 2), replace=False),
+            np.random.choice(np.where(self.__y == 1)[0], int(test_count / 2), replace=False))
         
         train_indices = list(set(range(len(self.__y))) - set(test_indices))
 
@@ -110,9 +117,9 @@ class Dataset:
         pos_indices = indices[-num + 1 : -1]
 
         print("Highly Negative Words:")
-        print([str(x) for x in list(vocab[neg_inds])])
-        print("\nHighly positive words:")
-        print([str(x) for x in list(vocab[pos_inds])])
+        print([str(x) for x in list(vocab[neg_indices])])
+        print("Highly positive words:")
+        print([str(x) for x in list(vocab[pos_indices])])
 
 
     def get_train_data(self) -> np.ndarray:

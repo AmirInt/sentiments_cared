@@ -16,8 +16,8 @@ class Dataset:
             lower_case: bool,
             remove_stop_words: bool,
             stop_words: list,
-            max_features: int,
-            test_count: int) -> None:
+            test_count: int,
+            max_features: int) -> None:
 
         load_dataset(data_path)
         
@@ -72,7 +72,7 @@ class Dataset:
     
     
     def to_bag_of_words(self, max_features) -> None:
-        vectoriser = CountVectorizer(
+        self.__vectoriser = CountVectorizer(
             analyzer="word",
             tokenizer=None,
             preprocessor=None,
@@ -99,6 +99,21 @@ class Dataset:
         self.__test_data = self.__sentences[test_indices]
         self.__test_labels = self.__y[test_indices]
     
+
+    def introduce_influencer_words(self, w: np.ndarray, num: int) -> None:
+        vocab = np.array(
+            [z[0] for z in sorted(self.__vectoriser.vocabulary_.items(), key=lambda x: x[1])])
+        
+        indices = np.argsort(w)
+
+        neg_indices = indices[0 : num]
+        pos_indices = indices[-num + 1 : -1]
+
+        print("Highly Negative Words:")
+        print([str(x) for x in list(vocab[neg_inds])])
+        print("\nHighly positive words:")
+        print([str(x) for x in list(vocab[pos_inds])])
+
 
     def get_train_data(self) -> np.ndarray:
         return self.__train_data

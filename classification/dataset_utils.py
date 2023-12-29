@@ -1,4 +1,5 @@
 import os
+import time
 import string
 import numpy as np
 import random
@@ -105,6 +106,10 @@ class Dataset:
 
         self.__test_data = self.__sentences[test_indices]
         self.__test_labels = self.__y[test_indices]
+
+        # Cancel the effect of seed(0)
+        t = 1000 * time.time() # current time in milliseconds
+        np.random.seed(int(t) % 2**32)
     
 
     def introduce_influencer_words(self, w: np.ndarray, num: int) -> None:

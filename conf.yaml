@@ -38,5 +38,6 @@ dataset:
     - in
     - out
     - by
+    - then
   test_count: 500
   bag_of_words_max_features: 4500

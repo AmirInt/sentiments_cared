@@ -26,7 +26,7 @@ Finally, we remap the labels from "0 vs. 1" to "-1 vs. 1".
 
 #### Creating the model
 
-We use the scikit-learn package's linear model module to create a stochastic gradient descend classifier and fit it to data. This model is then used to predict the classes and probabilities of the test data.
+We use the scikit-learn package's linear model module to create a stochastic gradient descent classifier and fit it to data. This model is then used to predict the classes and probabilities of the test data.
 
 ## Dependencies
 
